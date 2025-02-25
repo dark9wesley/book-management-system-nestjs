@@ -5,6 +5,8 @@ import {
   format,
   transports,
 } from 'winston';
+import * as dayjs from 'dayjs';
+import * as chalk from 'chalk';
 
 export class Logger implements LoggerService {
   private readonly logger: WinstonLogger;
@@ -12,20 +14,42 @@ export class Logger implements LoggerService {
   constructor() {
     this.logger = createLogger({
       level: 'debug',
-      format: format.combine(format.colorize(), format.simple()),
+      format: format.combine(
+        format.colorize(),
+        format.printf(({ context, level, message, time }) => {
+          const appStr = chalk.green(`[NEST]`);
+          const contextStr = chalk.yellow(`[${context as string}]`);
+
+          const splitStr = chalk.gray('-');
+
+          return `${appStr} ${splitStr} ${time as string} ${splitStr} ${contextStr} ${level} ${message as string}`;
+        }),
+      ),
       transports: [new transports.Console()],
     });
   }
 
   log(message: string, context?: string) {
-    this.logger.log('info', `[${context}] ${message}`);
+    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.logger.log('info', message, {
+      time,
+      context,
+    });
   }
 
   error(message: string, context?: string) {
-    this.logger.log('error', `[${context}] ${message}`);
+    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.logger.log('error', message, {
+      time,
+      context,
+    });
   }
 
   warn(message: string, context?: string) {
-    this.logger.log('warn', `[${context}] ${message}`);
+    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.logger.log('warn', message, {
+      time,
+      context,
+    });
   }
 }
