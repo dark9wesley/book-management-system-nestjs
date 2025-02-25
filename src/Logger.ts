@@ -14,18 +14,26 @@ export class Logger implements LoggerService {
   constructor() {
     this.logger = createLogger({
       level: 'debug',
-      format: format.combine(
-        format.colorize(),
-        format.printf(({ context, level, message, time }) => {
-          const appStr = chalk.green(`[NEST]`);
-          const contextStr = chalk.yellow(`[${context as string}]`);
+      transports: [
+        new transports.Console({
+          format: format.combine(
+            format.colorize(),
+            format.printf(({ context, level, message, time }) => {
+              const appStr = chalk.green(`[NEST]`);
+              const contextStr = chalk.yellow(`[${context as string}]`);
 
-          const splitStr = chalk.gray('-');
+              const splitStr = chalk.gray('-');
 
-          return `${appStr} ${splitStr} ${time as string} ${splitStr} ${contextStr} ${level} ${message as string}`;
+              return `${appStr} ${splitStr} ${time as string} ${splitStr} ${contextStr} ${level} ${message as string}`;
+            }),
+          ),
         }),
-      ),
-      transports: [new transports.Console()],
+        new transports.File({
+          filename: 'logs/error.log',
+          level: 'error',
+          format: format.combine(format.timestamp(), format.json()),
+        }),
+      ],
     });
   }
 
