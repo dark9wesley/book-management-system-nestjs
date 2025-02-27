@@ -26,6 +26,8 @@ RUN npm config set registry https://registry.npmmirror.com
 
 RUN npm install --production
 
+RUN npm install pm2 -g
+
 EXPOSE 3000
 
-CMD ["node", "./dist/main.js"]
+CMD ["pm2-runtime", "./dist/main.js"]
